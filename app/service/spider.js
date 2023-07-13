@@ -136,15 +136,19 @@ class SpiderService extends Service {
   async downloadImage(imgUrl, imgName, process) {
     const { ctx } = this;
     const { savePath } = this.config;
-
-    const result = await ctx.curl(imgUrl, { dataType: 'buffer' });
-
     const fileName = `${imgName}.jpeg`;
     const filePath = path.join(savePath, fileName);
-    fs.writeFileSync(filePath, result.data);
-    console.log(`(${process})下载完成：${imgName}`);
 
-    return true;
+    try {
+      fs.accessSync(filePath);
+      console.log(`(${process})已存在，忽略下载：${imgName}`);
+      return true;
+    } catch (error) {
+      const result = await ctx.curl(imgUrl, { dataType: 'buffer' });
+      fs.writeFileSync(filePath, result.data);
+      console.log(`(${process})下载完成：${imgName}`);
+      return true;
+    }
   }
 
 }
