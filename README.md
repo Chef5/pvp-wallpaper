@@ -2,7 +2,7 @@
 
 王者荣耀壁纸批量下载器，可以批量保存官方壁纸
 
-> 本项目仅用于学习`puppeteer`，项目完整演示了内容获取、页面交互、数据保存等基本用法
+![pvp-wallpaper.png](http://img.cdn.1zdz.cn/github/readme/pvp-wallpaper.png)
 
 ## 一、获取项目
 
