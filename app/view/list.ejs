@@ -1,0 +1,38 @@
+<style>
+  .list ul {
+    padding: 0;
+    list-style-type: none;
+  }
+  .list li {
+    display: flex;
+    align-items: baseline;
+    margin-bottom: 15px;
+  }
+  .list .hr {
+    margin-top: 0;
+    margin-bottom: 0;
+    margin-right: 8px;
+    margin-left: 8px;
+    height: 1px;
+    border: 0;
+    border-bottom: 1px dotted #ccc;
+    flex: 1;
+  }
+</style>
+<div class="list">
+  <ul>
+    <% for(var i = 0; i < list.length; i++){ %>
+    <li>
+      <%= i+1 %> <%= list[i].title %>
+      <% for(var s = 0; s < size.length; s++){ %>
+        &nbsp;<a target="_blank" href="<%= list[i][`image${s+1}`] %>"><%= size[s] %></a>
+      <%}%>
+      <hr class="hr" />
+    </li>
+    <%}%>
+  </ul>
+  
+</div>
+<script>
+  
+</script>

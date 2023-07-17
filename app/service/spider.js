@@ -43,6 +43,7 @@ class SpiderService extends Service {
     });
     if (result.status !== 200) {
       console.log(result);
+      this.service.logger.error('API error');
       throw new Error('API error');
     }
     return result.data;
@@ -51,15 +52,15 @@ class SpiderService extends Service {
 
   /**
    * @description 保存图片到指定目录
+   * @param savePath 保存路径
    * @param imgUrl 图片链接
    * @param imgName 图片名称
    * @param process 进度
    * @return {*}
    * @memberof SpiderService
    */
-  async downloadImage(imgUrl, imgName, process) {
+  async downloadImage(savePath, imgUrl, imgName, process) {
     const { ctx } = this;
-    const { savePath } = this.config;
     const fileNum = imgUrl.split('_')[2];
     const fileName = `${imgName}-${fileNum}.jpeg`;
     const filePath = path.join(savePath, fileName);
@@ -74,12 +75,12 @@ class SpiderService extends Service {
 
     try {
       fs.accessSync(filePath);
-      console.log(`(${process})已存在，忽略下载：${fileName}`);
+      this.service.logger.text(`(${process})已存在，忽略下载：${fileName}`);
       return Promise.resolve();
     } catch (error) {
       const result = await ctx.curl(imgUrl, { dataType: 'buffer' });
       fs.writeFileSync(filePath, result.data);
-      console.log(`(${process})下载完成：${fileName}`);
+      this.service.logger.text(`(${process})下载完成：${fileName}`);
       return Promise.resolve();
     }
   }

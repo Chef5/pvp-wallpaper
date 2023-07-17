@@ -4,14 +4,16 @@ class PvpService extends Service {
   /**
    * @description 获取数据并保存为json
    * @param updateLocalDatabase 是否需要更新本地数据库
+   * @param config
    * @memberof PvpService
    */
-  async task(updateLocalDatabase = false) {
+  async task(updateLocalDatabase = false, config = {}) {
     if (updateLocalDatabase) {
       const wallpaperList = await this.getWallpaperListFromOfficialWebsite();
       await this.updateLocalDatabase(wallpaperList);
     }
-    await this.downloadWallpaper();
+    const { savePath, saveSize } = config;
+    await this.downloadWallpaper(savePath, saveSize);
   }
 
   /**
@@ -20,16 +22,16 @@ class PvpService extends Service {
    * @memberof PvpService
    */
   async getWallpaperListFromOfficialWebsite() {
-    console.log('-----从官网获取新数据--------------');
+    this.service.logger.text('-----从官网获取新数据--------------');
     const databaseCount = await this.service.wallpaper.count();
     let list = [];
     try {
       const pre = await this.service.spider.getListByAPI(0, 80);
       const { iTotalLines, iTotalPages } = pre;
-      console.log(iTotalLines, iTotalPages, databaseCount);
-      console.log('本地数据：', databaseCount);
-      console.log('官网数据：', iTotalLines);
-      console.log('官网分页数(80/p)：', iTotalPages);
+      // this.service.logger.text(`${iTotalLines}, ${iTotalPages}, ${databaseCount}`);
+      this.service.logger.text(`本地数据：${databaseCount}`);
+      this.service.logger.text(`官网数据：${iTotalLines}`);
+      this.service.logger.text(`官网分页数(80/p)：${iTotalPages}`);
       if (databaseCount < iTotalLines) {
         for (let page = iTotalPages - 1; page >= 0; page--) {
           const res = await this.service.spider.getListByAPI(page, 80);
@@ -42,7 +44,7 @@ class PvpService extends Service {
         }
         return list;
       }
-      console.log('-----无更新--------------');
+      this.service.logger.text('-----无更新--------------');
       return [];
     } catch (error) {
       return [];
@@ -56,7 +58,10 @@ class PvpService extends Service {
    * @memberof PvpService
    */
   async updateLocalDatabase(list) {
-    console.log('-----更新本地数据库--------------');
+    if (list.length === 0) {
+      return;
+    }
+    this.service.logger.text('-----更新本地数据库--------------');
     const getUrl = str => decodeURIComponent(str).replace('/200', '/0');
     return await this.service.wallpaper.bulkCreate(list.map(t => ({
       title: decodeURIComponent(t.sProdName),
@@ -74,19 +79,23 @@ class PvpService extends Service {
 
   /**
    * @description 下载
+   * @param userPath
+   * @param userSize
    * @memberof PvpService
    */
-  async downloadWallpaper() {
-    console.log('-----执行下载--------------');
+  async downloadWallpaper(userPath, userSize) {
+    this.service.logger.text('-----执行下载--------------');
     const { saveSize, savePath, size } = this.config;
-    if (saveSize < 0 || saveSize > 7) {
+    const sSize = userSize || saveSize;
+    const sPath = userPath || savePath;
+    if (sSize < 0 || sSize > 7) {
       throw new Error('saveSize 配置错误 in config.default.js');
     }
-    console.log('下载尺寸：', size[saveSize]);
-    console.log('下载路径：', savePath);
+    this.service.logger.text(`下载尺寸：${size[sSize]}`);
+    this.service.logger.text(`下载路径：${sPath}`);
     const list = await this.service.wallpaper.getList();
     for (let index = 0; index < list.length; index++) {
-      await this.service.spider.downloadImage(list[index][`image${saveSize + 1}`], list[index].title, `${index + 1}/${list.length}`);
+      await this.service.spider.downloadImage(sPath, list[index][`image${Number(sSize) + 1}`], list[index].title, `${index + 1}/${list.length}`);
     }
   }
 }

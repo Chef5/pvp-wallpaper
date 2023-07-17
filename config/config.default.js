@@ -14,7 +14,7 @@ const size = [
   '1920x1440', // 7
 ];
 
-const saveSize = 6; // 需要保存的尺寸
+const saveSize = 5; // 需要保存的尺寸
 const savePath = `/Users/nunet/Pictures/壁纸/pvp-${size[saveSize]}/`; // 保存路径（绝对路径）
 
 
@@ -26,7 +26,13 @@ module.exports = appInfo => {
    * built-in config
    * @type {Egg.EggAppConfig}
    **/
-  const config = exports = {};
+  const config = exports = {
+    security: {
+      csrf: {
+        enable: false,
+      },
+    },
+  };
 
   // use for cookie sign key, should change to your own and keep security
   config.keys = appInfo.name + '_1684770348010_4378';
@@ -36,6 +42,24 @@ module.exports = appInfo => {
 
   // add your user config here
   const userConfig = {
+    view: {
+      mapping: {
+        '.ejs': 'ejs',
+      },
+    },
+    io: {
+      init: {
+        wsEngine: 'ws',
+      },
+      namespace: {
+        '/': {
+          connectionMiddleware: [
+            'connection',
+          ],
+          packetMiddleware: [],
+        },
+      },
+    },
     wallpaperUrl: 'https://pvp.qq.com/web201605/wallpaper.shtml',
     size,
     saveSize, // 需要保存的尺寸
