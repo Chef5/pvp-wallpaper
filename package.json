@@ -7,10 +7,11 @@
     "declarations": true
   },
   "dependencies": {
-    "cheerio": "^1.0.0-rc.12",
+    "@journeyapps/sqlcipher": "^5.3.1",
     "egg": "^3",
+    "egg-orm": "^2.3.0",
     "egg-scripts": "^2",
-    "puppeteer": "^20.3.0"
+    "sqlite3": "^5.1.6"
   },
   "devDependencies": {
     "egg-bin": "^5",

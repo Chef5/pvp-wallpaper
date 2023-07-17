@@ -9,6 +9,6 @@ module.exports = {
   },
   async task(ctx) {
     // 获取数据并保存为json 预计执行 33*1500 ms
-    await ctx.service.pvp.task();
+    // await ctx.service.pvp.task(true);
   },
 };
