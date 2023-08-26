@@ -1,5 +1,8 @@
 const Service = require('egg').Service;
 
+// DOC: https://sequelize.org/api/v6/class/src/model.js~model
+// DOC: https://leoric.js.org/api/Bone.html
+
 class WallpaperService extends Service {
 
   /**
@@ -37,9 +40,18 @@ class WallpaperService extends Service {
    * @memberof WallpaperService
    */
   async bulkCreate(wallpapers) {
-    return await this.ctx.model.Wallpaper.bulkCreate(wallpapers, {
-      ignoreDuplicates: true,
-    });
+    if (!Array.isArray(wallpapers)) {
+      return new Error('insert value must be an array');
+    }
+    // public static async upsert(values: object, options: object): Promise<Array<Model, boolean|null>>
+    // Insert or update a single row. An update will be executed if a row which matches the supplied values on either the primary key or a unique key is found. Note that the unique index must be defined in your sequelize model and not just in the table. Otherwise you may experience a unique constraint violation, because sequelize fails to identify the row that should be updated.
+    return await Promise.all(wallpapers.map(async wallpaper => await this.ctx.model.Wallpaper.upsert(wallpaper)));
+
+    // bulkCreate() 只能忽略主键duplicate
+    // return await this.ctx.model.Wallpaper.bulkCreate(wallpapers, {
+    //   ignoreDuplicates: true, // Ignore duplicate values for primary keys
+    //   updateOnDuplicate: [], // Fields to update if row key already exists
+    // });
   }
 
   /**

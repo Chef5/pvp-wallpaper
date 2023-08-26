@@ -26,8 +26,11 @@ module.exports = app => {
   // });
   // return Wallpaper;
 
+  // DOC: https://github.com/eggjs/egg-orm
+  // DOC: https://leoric.js.org/api/Bone.html
+
   class Wallpaper extends Bone {
-    static table = 'wallpaper';
+    static table = 'wallpaper'
 
     static attributes = {
       id: {
